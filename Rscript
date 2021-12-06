@@ -1,0 +1,260 @@
+getwd()
+df <- read.csv("data_1.csv")
+str(df)
+df2 <- read.csv("data_3.csv")
+str(df1)
+head(df1)
+df3 <- read.csv('data_118.csv')
+
+
+library(dplyr)
+install.packages('readr', dependencies = TRUE, repos='http://cran.rstudio.com/')
+library(readr)
+df_final <- list.files(path="C:/Users/govin/Documents/a", full.names = TRUE) %>% 
+  lapply(read_csv) %>% 
+  bind_rows 
+
+df_final[['date_time']] <- strptime(df_final[['date_time']],
+                                    format = "%Y-%m-%d %H:%M:%S")
+df_final2 <- na.omit(df_final)
+head(df_final)
+colnames(df_final)
+
+df_final <- na.omit(df_final)
+
+
+
+summary(df_final)
+
+for(i in 2:42) {
+  
+  print(summary(df_final[i:i+7]))
+  i = i+8
+  
+} 
+
+summary(df_final[2:9])
+summary(df_final[10:17])
+summary(df_final[18:25])
+summary(df_final[26:33])
+summary(df_dinal[34:41])
+summary(df_final[42:49])
+summary(df_final[50:54])
+
+
+install.packages('psych', dependencies = TRUE, repos='http://cran.rstudio.com/')
+install.packages('tidyverse', dependencies = TRUE, repos='http://cran.rstudio.com/')
+
+library(psych)
+
+
+cols <- c("House_1<>Temperature<>Ambient Exterior", "House_2<>Temperature<>Ambient Exterior", "House_3<>Temperature<>Ambient Exterior", "House_4<>Temperature<>Ambient Exterior","House_5<>Temperature<>Ambient Exterior","House_6<>Temperature<>Ambient Exterior", "House_7<>Temperature<>Ambient Exterior")
+summary(df_final[cols])
+
+d.summary.extended <- df_final %>%
+  select(`House_1<>Temperature<>Ambient Exterior`,`House_2<>Temperature<>Ambient Exterior`,`House_3<>Temperature<>Ambient Exterior`,`House_4<>Temperature<>Ambient Exterior`,`House_5<>Temperature<>Ambient Exterior`,`House_6<>Temperature<>Ambient Exterior`,`House_7<>Temperature<>Ambient Exterior`) %>%
+  psych::describe(quant=c(.25,.75)) %>%
+  as_tibble(rownames="rowname")  %>%
+  print()
+
+d.summary.extended <- df_final %>%
+  select(`House_1<>Dew Point<>Ambient Exterior`,`House_2<>Dew Point<>Ambient Exterior`,`House_3<>Dew Point<>Ambient Exterior`,`House_4<>Dew Point<>Ambient Exterior`,`House_5<>Dew Point<>Ambient Exterior`,`House_6<>Dew Point<>Ambient Exterior`,`House_7<>Dew Point<>Ambient Exterior`) %>%
+  psych::describe(quant=c(.25,.75)) %>%
+  as_tibble(rownames="rowname")  %>%
+  print()
+
+
+df_final$tempdiff1 <- (df_final$`House_1<>Temperature<>Ambient Exterior`- df_final$`House_1<>Temperature<>Ambient Interior`)
+df_final$tempdiff2 <- (df_final$`House_2<>Temperature<>Ambient Exterior`- df_final$`House_2<>Temperature<>Ambient Interior`)
+df_final$tempdiff3 <- (df_final$`House_3<>Temperature<>Ambient Exterior`- df_final$`House_3<>Temperature<>Ambient Interior`)
+df_final$tempdiff4 <- (df_final$`House_4<>Temperature<>Ambient Exterior`- df_final$`House_4<>Temperature<>Ambient Interior`)
+df_final$tempdiff5 <- (df_final$`House_5<>Temperature<>Ambient Exterior`- df_final$`House_5<>Temperature<>Ambient Interior`)
+df_final$tempdiff6 <- (df_final$`House_6<>Temperature<>Ambient Exterior`- df_final$`House_6<>Temperature<>Ambient Interior`)
+
+d.summary.extended <- df_final %>%
+  select(tempdiff1,tempdiff2,tempdiff3,tempdiff4,tempdiff5,tempdiff6) %>%
+  psych::describe(quant=c(.25,.75)) %>%
+  as_tibble(rownames="rowname")  %>%
+  print()
+
+df_final$mo <- strftime(df_final$date_time, "%m")
+
+
+
+#bymonth <- aggregate(House_1<>Temperature<>Ambient Exterior ~ mo,
+                     #data=df_final,FUN=sum)
+
+
+
+head(df_final)
+
+
+library(tidyverse)
+
+by_mo <- df_final %>% group_by(mo)
+
+summo <- by_mo %>% summarise(
+  dew_exteriorHouse1 = mean(`House_1<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse2 = mean(`House_2<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse3 = mean(`House_3<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse4 = mean(`House_4<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse5 = mean(`House_5<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse6 = mean(`House_6<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse7 = mean(`House_7<>Dew Point<>Ambient Exterior`)
+)  
+
+print(summo)
+
+summary_dewinterior <- by_mo %>% summarise(
+  dewinteriorh1 = mean(`House_1<>Dew Point<>Ambient Interior`),
+  dewinteriorh2 = mean(`House_2<>Dew Point<>Ambient Interior`),
+  dewinteriorh3 = mean(`House_3<>Dew Point<>Ambient Interior`),
+  dewinteriorh4 = mean(`House_4<>Dew Point<>Ambient Interior`),
+  dewinteriorh5 = mean(`House_5<>Dew Point<>Ambient Interior`),
+  dewinteriorh6 = mean(`House_6<>Dew Point<>Ambient Interior`)
+  
+)
+print(summary_dewinterior)
+
+summary_rooftempout <- by_mo %>% summarise(
+  rooftempouth1 = mean(`House_1<>Temperature<>Roof Exterior`),
+  rooftempouth2 = mean(`House_2<>Temperature<>Roof Exterior`),
+  rooftempouth3 = mean(`House_3<>Temperature<>Roof Exterior`),
+  rooftempouth4 = mean(`House_4<>Temperature<>Roof Exterior`),
+  rooftempouth5 = mean(`House_5<>Temperature<>Roof Exterior`),
+  rooftempouth6 = mean(`House_6<>Temperature<>Roof Exterior`),
+  rooftempouth7 = mean(`House_7<>Temperature<>Roof Exterior`)
+  
+)
+print((summary_rooftempout))  
+
+summary_rooftempin <- by_mo %>% summarise(
+  rooftempinh1 = mean(`House_1<>Temperature<>Roof Interior`),
+  rooftempinh2 = mean(`House_2<>Temperature<>Roof Interior`),
+  rooftempinh3 = mean(`House_3<>Temperature<>Roof Interior`),
+  rooftempinh4 = mean(`House_4<>Temperature<>Roof Interior`),
+  rooftempinh5 = mean(`House_5<>Temperature<>Roof Interior`),
+  rooftempinh6 = mean(`House_6<>Temperature<>Roof Interior`),
+  rooftempinh7 = mean(`House_7<>Temperature<>Roof Interior`)
+  
+)
+print(summary_rooftempin)
+
+summary_tempdiff <- by_mo %>% summarise(
+  tempdiffh1 = mean(tempdiff1),
+  tempdiffh2 = mean(tempdiff2),
+  tempdiffh3 = mean(tempdiff3),
+  tempdiffh4 = mean(tempdiff4),
+  tempdiffh5 = mean(tempdiff5),
+  tempdiffh6 = mean(tempdiff6),
+)
+print(summary_tempdiff)
+install.packages("lubridate")
+
+library(lubridate)
+
+summarytime_df <- df_final %>%
+  group_by(hour = lubridate::floor_date(time, "1 hour"), date_time) %>%
+  summarise(max_continuous_variable = max(continuous_variable))
+
+
+df_final$hour <- strftime(df_final$date_time, "%H")
+
+by_hour <- df_final %>% group_by(hour)
+
+summaryhourdewpoint <- by_hour %>% summarise(
+  dew_exteriorHouse11 = mean(`House_1<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse21 = mean(`House_2<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse31 = mean(`House_3<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse41 = mean(`House_4<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse51 = mean(`House_5<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse61 = mean(`House_6<>Dew Point<>Ambient Exterior`),
+  dew_exteriorHouse71 = mean(`House_7<>Dew Point<>Ambient Exterior`)
+)  
+
+print(summaryhourdewpoint)
+
+library(ggplot2)
+
+ggplot(summaryhourdewpoint, aes(hour, dew_exteriorHouse11, group = 1)) +
+  geom_line()+
+  geom_point(colour="red")
+  
+df_final$date<-as.Date(df_final$date_time)
+
+
+p <- ggplot(df_final, aes(x=date, y= `House_1<>Dew Point<>Ambient Exterior`)) +
+  geom_line()
+  xlab("")
+  
+#col <- c("date", "House_7<>Temperature<>Ambient Exterior")
+
+allexteriordewhouse1 <- colMeans(matrix(df_final$`House_1<>Dew Point<>Ambient Exterior`, nrow=4))
+hourmean <- colMeans(matrix(df_final$hour, nrow=4))
+
+alldates <- seq(as.Date("2021/03/01"), by = "day", length.out = 52)
+
+list1 <- 0:23
+        
+
+
+
+#list2 <- rep(theDate,length(list1))
+
+start <- as.Date("01-03-21",format="%d-%m-%y")
+end   <- as.Date("21-04-21",format="%d-%m-%y")
+
+theDate <- start
+list2 <- list()
+
+while (theDate <= end)
+{
+  c1 <- rep(theDate,length(list1))
+  list2[length(list2)+1:length(list2)+24] <- c1
+  theDate <- theDate + 1                    
+}
+
+print(list2)
+
+dateorder <- rep(seq(as.Date("2020-03-01"),as.Date("2020-04-30"),1),each=96)
+list3 <- data.frame(date = dateorder, number = list1)
+list3$z <- allexteriordewhouse1
+print(dateorder)
+
+df_final$hourminute <- strftime(df_final$date_time, "%H:%M")
+
+ggplot(list3, aes(date, number, fill= z)) + 
+  geom_tile()
+
+
+df_final$tempdiffhouse1 <- df_final$`House_1<>Temperature<>Ambient Exterior` - df_final$`House_1<>Temperature<>Ambient Interior`
+p1 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse1)) + 
+  geom_tile()
+
+
+df_final$tempdiffhouse2 <- df_final$`House_2<>Temperature<>Ambient Exterior` - df_final$`House_2<>Temperature<>Ambient Interior`
+p2 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse2)) + 
+  geom_tile()
+
+df_final$tempdiffhouse3 <- df_final$`House_3<>Temperature<>Ambient Exterior` - df_final$`House_3<>Temperature<>Ambient Interior`
+p3 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse3)) + 
+  geom_tile()
+
+df_final$tempdiffhouse4 <- df_final$`House_4<>Temperature<>Ambient Exterior` - df_final$`House_4<>Temperature<>Ambient Interior`
+p4 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse4)) + 
+  geom_tile()
+
+df_final$tempdiffhouse5 <- df_final$`House_5<>Temperature<>Ambient Exterior` - df_final$`House_5<>Temperature<>Ambient Interior`
+p5 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse5)) + 
+  geom_tile()
+
+df_final$tempdiffhouse6 <- df_final$`House_6<>Temperature<>Ambient Exterior` - df_final$`House_6<>Temperature<>Ambient Interior`
+p6 <- ggplot(df_final, aes(date, hourminute , fill= tempdiffhouse6)) + 
+  geom_tile()
+
+install.packages("ggpubr")
+library(ggpubr)
+
+ggarrange(p1, p2, p3, p4, p5, p6, 
+          labels = c("House1", "House2", "House3","House4","House5","House6"),
+          ncol = 2, nrow = 3)
